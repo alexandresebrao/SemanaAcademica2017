@@ -9,7 +9,6 @@ class App extends Component {
     super(props);
     this.state = {
       item: null,
-      namesList:[],
       showDeleteModal: false
     };
     this.handleInsert = this.handleInsert.bind(this);
@@ -19,12 +18,23 @@ class App extends Component {
     this.handleOpenDeleteModal = this.handleOpenDeleteModal.bind(this);
   }
 
+  componentWillMount() {
+    var list = JSON.parse(localStorage.getItem('namesList')) || [];
+    this.setState({namesList: list});
+  }
+
+  updateList(list) {
+    localStorage.setItem('namesList', JSON.stringify(list));
+    this.setState({namesList: list});
+  }
+
   handleInsert() {
     var newList = this.state.namesList;
 
     if (this.state.item !== null) {
       newList.push(this.state.item);
-      this.setState({namesList: newList, item: null});
+      this.updateList(newList)
+      this.setState({item: null});
     } else {
       alert("Valor vazio :(");
     }
@@ -41,8 +51,10 @@ class App extends Component {
   handleDelete() {
     this.setState({
           item: null,
-          namesList:[]
+          namesList:[],
+          showDeleteModal: false
         });
+    this.updateList([]);
   }
 
   getListNames() {
@@ -68,7 +80,7 @@ class App extends Component {
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={this.closeDeleteModal}  color="default" text="Cancelar!" />
-            <Button onClick={this.closeDeleteModal}  color="danger" text="Okay!" />
+            <Button onClick={this.handleDelete}  color="danger" text="Okay!" />
           </Modal.Footer>
         </Modal>
       )
